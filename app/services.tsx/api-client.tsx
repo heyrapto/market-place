@@ -538,4 +538,3 @@ export const apiClient = new ApiClient();
 
 // Export default for convenience
 export default apiClient;
-
