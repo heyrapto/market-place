@@ -78,7 +78,9 @@ export function useUpdateMarketItem() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: marketKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: marketKeys.detail(data.id) });
+      if (data) {
+        queryClient.invalidateQueries({ queryKey: marketKeys.detail(data.id) });
+      }
     },
   });
 }

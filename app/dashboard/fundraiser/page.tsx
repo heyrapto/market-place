@@ -19,9 +19,11 @@ import { EmptyState } from "../../components/ui/empty-state";
 import { ErrorState } from "../../components/ui/error-state";
 import { useFundraisers, useCreateFundraiser, useUpdateFundraiser, useDeleteFundraiser } from "@/app/hooks/use-fundraiser-query";
 import { FundraiserModal } from "../../components/modals/fundraiser-modal";
+import { FundraiserDetailModal } from "../../components/modals/fundraiser-detail-modal";
 import { DeleteModal } from "../../components/ui/delete-modal";
 import { Button } from "../../components/ui/button";
 import { Fundraiser, CreateFundraiserRequest, UpdateFundraiserRequest } from "@/app/services.tsx/api-client";
+import { useAuthStore } from "@/app/store";
 
 export default function FundraiserPage() {
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
@@ -36,6 +38,8 @@ export default function FundraiserPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
   const [editingFundraiser, setEditingFundraiser] = React.useState<Fundraiser | null>(null);
   const [deletingFundraiser, setDeletingFundraiser] = React.useState<Fundraiser | null>(null);
+  const [viewingFundraiserId, setViewingFundraiserId] = React.useState<string | null>(null);
+  const { user } = useAuthStore();
 
   const { data: fundraiserData, isLoading, error, refetch } = useFundraisers({
     page: 1,
@@ -207,7 +211,7 @@ export default function FundraiserPage() {
               />
             ) : viewMode === "grid" ? (
               <div className="grid grid-cols-3 gap-4">
-                {fundraisers.map((fundraiser) => (
+                {fundraisers.map((fundraiser: Fundraiser) => (
                   <div
                     key={fundraiser.id}
                     className="bg-[#262626] p-1 rounded-[20px] border border-[#262626] overflow-hidden hover:border-[#333] transition-colors cursor-pointer"
@@ -239,11 +243,16 @@ export default function FundraiserPage() {
                           <span className="text-[#A3A3A3] text-xs mb-1">
                             Raised
                           </span>
-                          <span className="text-white font-medium text-lg">
-                            ${fundraiser.raised.toLocaleString()} / ${fundraiser.goal.toLocaleString()}
+                          <span className="text-white font-medium text-lg w-[100px]">
+                            ${(fundraiser.totalRaised || fundraiser.raised || 0).toLocaleString()} / ${fundraiser.goal.toLocaleString()}
                           </span>
                         </div>
-                        <h5 className="text-sm text-[#335CFF]">View details</h5>
+                        <button
+                          onClick={() => setViewingFundraiserId(fundraiser.id)}
+                          className="text-sm text-[#335CFF] hover:underline cursor-pointer"
+                        >
+                          View details
+                        </button>
                       </div>
 
                       <div className="flex items-start justify-between mb-3 mt-[15px]">
@@ -268,7 +277,7 @@ export default function FundraiserPage() {
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {fundraisers.map((fundraiser) => (
+                {fundraisers.map((fundraiser: Fundraiser) => (
                   <div
                     key={fundraiser.id}
                     className="bg-[#262626] p-1 rounded-[20px] border border-[#262626] overflow-hidden hover:border-[#333] transition-colors cursor-pointer"
@@ -337,6 +346,15 @@ export default function FundraiserPage() {
       </div>
 
       {/* Modals */}
+      <FundraiserDetailModal
+        isOpen={!!viewingFundraiserId}
+        onClose={() => setViewingFundraiserId(null)}
+        fundraiserId={viewingFundraiserId || ""}
+        onEdit={(fundraiser: Fundraiser) => setEditingFundraiser(fundraiser)}
+        onDelete={(fundraiser: Fundraiser) => setDeletingFundraiser(fundraiser)}
+        canEdit={user?.id ? fundraisers.find((f: Fundraiser) => f.id === viewingFundraiserId)?.ownerId === user.id : false}
+      />
+
       <FundraiserModal
         isOpen={isCreateModalOpen || !!editingFundraiser}
         onClose={() => {
