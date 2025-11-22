@@ -19,9 +19,11 @@ import { EmptyState } from "../../components/ui/empty-state";
 import { ErrorState } from "../../components/ui/error-state";
 import { useMarketItems, useCreateMarketItem, useUpdateMarketItem, useDeleteMarketItem } from "@/app/hooks/use-market-query";
 import { MarketItemModal } from "../../components/modals/market-item-modal";
+import { MarketItemDetailModal } from "../../components/modals/market-item-detail-modal";
 import { DeleteModal } from "../../components/ui/delete-modal";
 import { Button } from "../../components/ui/button";
 import { MarketItem, CreateMarketItemRequest, UpdateMarketItemRequest } from "@/app/services.tsx/api-client";
+import { useAuthStore } from "@/app/store";
 
 export default function MarketPage() {
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
@@ -36,6 +38,8 @@ export default function MarketPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
   const [editingItem, setEditingItem] = React.useState<MarketItem | null>(null);
   const [deletingItem, setDeletingItem] = React.useState<MarketItem | null>(null);
+  const [viewingItemId, setViewingItemId] = React.useState<string | null>(null);
+  const { user } = useAuthStore();
 
   const { data: marketData, isLoading, error, refetch } = useMarketItems({
     page: 1,
@@ -243,7 +247,12 @@ export default function MarketPage() {
                             ${product.price} {product.currency}
                           </span>
                         </div>
-                        <h5 className="text-sm text-[#335CFF]">View details</h5>
+                        <button
+                          onClick={() => setViewingItemId(product.id)}
+                          className="text-sm text-[#335CFF] hover:underline cursor-pointer"
+                        >
+                          View details
+                        </button>
                       </div>
 
                       <div className="flex items-start justify-between mb-3 mt-[15px]">
@@ -337,6 +346,15 @@ export default function MarketPage() {
       </div>
 
       {/* Modals */}
+      <MarketItemDetailModal
+        isOpen={!!viewingItemId}
+        onClose={() => setViewingItemId(null)}
+        itemId={viewingItemId || ""}
+        onEdit={(item) => setEditingItem(item)}
+        onDelete={(item) => setDeletingItem(item)}
+        canEdit={user?.id ? items.find((i) => i.id === viewingItemId)?.sellerId === user.id : false}
+      />
+
       <MarketItemModal
         isOpen={isCreateModalOpen || !!editingItem}
         onClose={() => {

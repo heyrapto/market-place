@@ -29,6 +29,18 @@ export function useFundraisers(params?: FundraiserListParams) {
     queryKey: fundraiserKeys.list(params),
     queryFn: async () => {
       const response = await apiClient.getFundraisers(params);
+      // Handle API response structure: data.fundraisers vs data.items
+      if (response.data && 'fundraisers' in response.data) {
+        return {
+          items: (response.data as any).fundraisers || [],
+          pagination: (response.data as any).pagination || {
+            page: 1,
+            pageSize: 24,
+            total: 0,
+            totalPages: 0,
+          },
+        };
+      }
       return response.data;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -93,9 +105,11 @@ export function useUpdateFundraiser() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: fundraiserKeys.lists() });
-      queryClient.invalidateQueries({
-        queryKey: fundraiserKeys.detail(data.id),
-      });
+      if (data) {
+        queryClient.invalidateQueries({
+          queryKey: fundraiserKeys.detail(data.id),
+        });
+      }
     },
   });
 }

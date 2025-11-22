@@ -166,16 +166,21 @@ export interface Fundraiser {
   summary: string;
   description: string;
   goal: number;
-  raised: number;
+  raised?: number; // Some APIs return totalRaised
+  totalRaised?: number; // API response field
   deadlineAt: string;
   media: Media[];
   tags: string[];
   status: "active" | "completed" | "cancelled";
   views: number;
+  likes?: number;
+  updatesCount?: number;
+  supportersCount?: number;
   createdAt: string;
   updatedAt: string;
   owner?: User;
   category?: Category;
+  progress?: number;
 }
 
 export interface FundraiserListParams {
