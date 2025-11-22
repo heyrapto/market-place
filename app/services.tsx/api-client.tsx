@@ -166,7 +166,7 @@ export interface Fundraiser {
   summary: string;
   description: string;
   goal: number;
-  raised?: number; // Some APIs return totalRaised
+  raised: number; // Some APIs return totalRaised
   totalRaised?: number; // API response field
   deadlineAt: string;
   media: Media[];
