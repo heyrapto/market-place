@@ -2,7 +2,6 @@
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Button } from "../button";
-import Image from "next/image";
 
 const CustomConnectButton = ({
   onclick,

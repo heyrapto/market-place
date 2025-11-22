@@ -3,7 +3,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   apiClient,
-  Category,
   CreateCategoryRequest,
   UpdateCategoryRequest,
 } from "../services.tsx/api-client";
@@ -74,9 +73,13 @@ export function useUpdateCategory() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-      queryClient.invalidateQueries({
-        queryKey: categoryKeys.detail(data.slug),
-      });
+      
+      // Only invalidate if data and slug exist
+      if (data?.slug) {
+        queryClient.invalidateQueries({
+          queryKey: categoryKeys.detail(data.slug),
+        });
+      }
     },
   });
 }
