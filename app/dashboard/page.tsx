@@ -1,5 +1,6 @@
 import { AnoymousIcon, PlatformIcon, TokenIcon } from "../components/ui/icons";
 import CustomConnectButton from "../components/ui/custom/connect-button";
+import { PaymentButton } from "../components/payment/Payment";
 
 export default function DashboardPage() {
   return (
@@ -40,6 +41,7 @@ export default function DashboardPage() {
                 Token Gated
               </h5>
             </div>
+            <PaymentButton/>
           </div>
         </div>
       </div>
