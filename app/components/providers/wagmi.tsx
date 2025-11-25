@@ -9,7 +9,7 @@ import {
     QueryClientProvider,
     QueryClient,
 } from "@tanstack/react-query";
-import { base, baseSepolia } from "wagmi/chains";
+import { baseSepolia } from "wagmi/chains";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 
 const queryClient = new QueryClient();
